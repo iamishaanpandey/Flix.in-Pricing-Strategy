@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────────
+# FlixBus Pricing Intelligence Pipeline — Configuration
+# Change thresholds here. No need to touch any script.
+# ─────────────────────────────────────────────────────────────
+
+# ── INPUT / OUTPUT ──────────────────────────────────────────
+input_file: "data.xlsx"
+output_dir: "outputs"
+
+# ── OPERATOR ────────────────────────────────────────────────
+our_operator: "Flixbus"          # Exact string as it appears in Operator column
+
+# ── SIMILARITY ENGINE ───────────────────────────────────────
+departure_window_mins: 90        # Hard filter: ±90 min departure window
+departure_window_relaxed_mins: 150  # Expand to this if peer group < min_peer_group
+min_peer_group: 3                # Minimum comparable buses for a High/Med confidence flag
+weekend_days: [4, 5, 6]         # Friday=4, Saturday=5, Sunday=6 (Python weekday numbers)
+
+# ── FLAGGING ENGINE ─────────────────────────────────────────
+iqr_multiplier: 1.5              # Standard box-plot multiplier
+quality_score_threshold: 0.3    # Bus Score diff above this triggers quality adjustment
+price_col: "Weighted Average Price"  # Primary price column to use
+
+# ── URGENCY THRESHOLDS ──────────────────────────────────────
+occupancy_low: 0.50              # Below this = low occupancy
+occupancy_high: 0.75             # Above this = high occupancy
+occupancy_consider_raise: 0.85   # OK + above this = consider price raise
+
+# ── SOFT SCORING ────────────────────────────────────────────
+rating_band_width: 0.5           # ±0.5 star band for similarity boost
+review_tiers:                    # Review volume tiers
+  tier1_min: 500
+  tier2_min: 51
+  # below tier2_min = Tier 3
+
+# Operator size classification (by listing count percentiles)
+operator_size_large_pct: 0.80    # Top 20% = Large
+operator_size_small_pct: 0.20    # Bottom 20% = Small
